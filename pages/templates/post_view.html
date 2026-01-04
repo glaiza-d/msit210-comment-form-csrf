@@ -19,4 +19,27 @@
       {% endfor %}
    </ul>  
  
+<hr>
+
+<h4>Post a Comment</h4>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <p>
+    {{ form.author.label_tag }}<br>
+    {{ form.author }}
+    {{ form.author.errors }}
+  </p>
+
+  <p>
+    {{ form.text.label_tag }}<br>
+    {{ form.text }}
+    {{ form.text.errors }}
+  </p>
+
+  <button type="submit">Submit</button>
+</form>
+
 {% endblock %}

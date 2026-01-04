@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseBadRequest
 from pages.models import Post
-from pages.forms import PostForm
+from pages.forms import CommentForm, PostForm
 
 # Create your views here.
 def home(request):
@@ -47,7 +47,21 @@ def post_create(request):
 def post_view(request, pk):
     # post = get_object_or_404(Post, pk=pk)
     post = Post.objects.get(pk=pk)
-    return render(request, 'post_view.html', {'post': post})
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            return redirect('post_view', pk=post.pk)
+    else:
+        form = CommentForm()
+
+    return render(request, 'post_view.html', {
+        'post': post,
+        'form': form
+    })
+    # return render(request, 'post_view.html', {'post': post})
 
 def post_update(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -69,3 +83,6 @@ def post_delete(request, pk):
         post.delete()
         return redirect('post_list')
     return render(request, 'post_confirm_delete.html', {'post': post})
+
+def csrf_failure(request, reason=""):
+    return render(request, "403_csrf.html", status=403)
